@@ -9,9 +9,7 @@
 ## Declare global variables
 ##
 lookahead=                   ## lookahead character
-TRUE="0"
-FALSE="1"
-                              
+
 ########################################################################################
 ##
 ## getsymbol(): obtain character from input stream
@@ -50,6 +48,7 @@ function expected()
 {
     msg="${1}"
     aborterror "${msg} expected"
+    exit 1
 }
 
 ########################################################################################
@@ -74,15 +73,15 @@ function match()
 function issymbol()
 {
     symbol="${1}"
-    result=${FALSE}
+    result="FALSE"
 
     alphachk=$(echo "${symbol}" | grep '^[A-Za-z]$' | wc -l)
 
     if [ "${alphachk}" -eq 1 ]; then
-        result=${TRUE}
+        result="TRUE"
     fi
 
-    return ${result}
+    printf "${result}"
 }
 
 ########################################################################################
@@ -92,15 +91,15 @@ function issymbol()
 function isnumber()
 {
     symbol="${1}"
-    result=${FALSE}
+    result="FALSE"
 
     numberchk=$(echo "${symbol}" | grep '^[0-9]$' | wc -l)
 
     if [ "${numberchk}" -eq 1 ]; then
-        result=${TRUE}
+        result="TRUE"
     fi
 
-    return ${result}
+    printf "${result}"
 }
 
 ########################################################################################
@@ -118,7 +117,7 @@ function getname()
     result="${lookahead}"
     getsymbol
 
-    return "${result}" 
+    printf "${result}"
 }
 
 ########################################################################################
@@ -137,8 +136,6 @@ function getnumber()
     getsymbol
 
     printf "${result}"
-
-    return ${result}
 }
 
 ########################################################################################
@@ -168,7 +165,11 @@ function emitline()
 ##
 function expression()
 {
-    emitline "MOV R0,    $(getnumber)"
+    number="$(getnumber)"
+    if [ ! -z "${number}" ]; then
+        msg="MOV R0,    ${number}"
+        emitline "${msg}"
+    fi
 }
 
 ########################################################################################
