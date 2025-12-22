@@ -16,7 +16,13 @@ lookahead=                   ## lookahead character
 ##
 function getsymbol()
 {
-	lookahead=$(./fgetc.c)
+	printf "%s\n" "$(./fgetc.c)"
+	#lookahead=$(./fgetc.c)
+	#if [ "${lookahead}" = "+" ]; then
+	#	lookahead="T_PLUS"
+	#elif [ "${lookahead}" = "-" ]; then
+	#	lookahead="T_MINUS"
+	#fi
     #read -r -s -n 1 input
     #lookahead="${input}"
 }
@@ -62,7 +68,7 @@ function match()
     symbol="${1}"
 
     if [ "${lookahead}" = "${symbol}" ]; then
-        getsymbol
+		lookahead=$(getsymbol)
     else
         expected "${symbol}"
     fi
@@ -117,7 +123,7 @@ function getname()
     fi
 
     result="${lookahead}"
-    getsymbol
+	lookahead=$(getsymbol)
 
     printf "${result}"
 }
@@ -135,7 +141,7 @@ function getnumber()
     fi
 
     result="${lookahead}"
-    getsymbol
+	lookahead=$(getsymbol)
 	echo "getnumber" >> out
 	echo "---------------" >> out
 	echo "result:    ${result}" >> out
@@ -184,7 +190,7 @@ function term()
 ##
 function add()
 {
-    match "+"
+    match "T_PLUS"
     term
     emitline "IADD  R0,    R1"
 }
@@ -195,7 +201,7 @@ function add()
 ##
 function subtract()
 {
-    match "-"
+    match "T_MINUS"
     term
     emitline "ISUB  R0,    R1"
     emitline "ISGN  R0"
@@ -231,7 +237,7 @@ function expression()
 ##
 function initialize()
 {
-    getsymbol
+	lookahead=$(getsymbol)
 }
 
 ########################################################################################
