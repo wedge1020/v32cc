@@ -16,7 +16,8 @@ lookahead=                   ## lookahead character
 ##
 function getsymbol()
 {
-    read -n 1 lookahead
+    read -r -s -n 1 input
+	lookahead="${input}"
 }
                               
 ########################################################################################
@@ -161,15 +162,59 @@ function emitline()
 
 ########################################################################################
 ##
-## expression(): parse and translate a math expression
+## term(): parse and translate a math expression
 ##
-function expression()
+function term()
 {
     number="$(getnumber)"
     if [ ! -z "${number}" ]; then
-        msg="MOV R0,    ${number}"
+        msg="MOV   R0,    ${number}"
         emitline "${msg}"
     fi
+}
+
+########################################################################################
+##
+## add(): recognize and translate an addition
+##
+function add()
+{
+    match "+"
+    term
+    emitline "IADD  R0,    R1"
+}
+
+########################################################################################
+##
+## subtract(): recognize and translate a subtraction
+##
+function subtract()
+{
+    match "-"
+    term
+    emitline "ISUB  R0,    R1"
+}
+
+########################################################################################
+##
+## expression(): parse and translate an expression
+##
+function expression()
+{
+    term
+    emitline "MOV   R1,    R0"
+	getsymbol
+    case "${lookahead}" in
+        "+")
+            add
+            ;;
+        "-")
+            subtract
+            ;;
+        *)
+            expected "addop"
+            ;;
+    esac
 }
 
 ########################################################################################

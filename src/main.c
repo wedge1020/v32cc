@@ -168,14 +168,61 @@ void emitline (uint8_t *msg)
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //
-// expression(): parse and translate a math expression
+// term(): parse and translate a math expression
 //
-void expression (void)
+void term (void)
 {
     uint8_t  str[32];
 
-    sprintf ((char *) str, "MOV R0,    %c", getnumber ());
+    sprintf ((char *) str, "MOV   R0,    %c", getnumber ());
     emitline (str);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//
+// add(): recognize and translate an addition
+//
+void add (void)
+{
+    match ('+');
+    term ();
+    emitline ((char *) "IADD  R0,    R1");
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//
+// subtract(): recognize and translate a subtraction
+//
+void subtract (void)
+{
+    match ('-');
+    term ();
+    emitline ((char *) "ISUB  R0,    R1");
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//
+// expression(): parse and translate an expression
+//
+void expression (void)
+{
+    term ();
+    emitline ((char *) "MOV   R1,    R0");
+
+	switch (lookahead)
+	{
+		case '+':
+			add ();
+			break;
+
+		case '-':
+			subtract ();
+			break;
+
+		default:
+			expected ((char *) "add operation");
+			break;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
