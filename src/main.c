@@ -9,7 +9,7 @@
 //
 // Declare global variables
 //
-uint8_t	 lookahead; // lookahead character
+uint8_t     lookahead; // lookahead character
                               
 ////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -26,7 +26,7 @@ void getsymbol (void)
 //
 void showerror (uint8_t *msg)
 {
-	fprintf (stderr, "[error] %s\n", msg);
+    fprintf (stderr, "[error] %s\n", msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -35,8 +35,8 @@ void showerror (uint8_t *msg)
 //
 void aborterror (uint8_t *msg)
 {
-	showerror (msg);
-	exit (1);
+    showerror (msg);
+    exit (1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -45,9 +45,9 @@ void aborterror (uint8_t *msg)
 //
 void expected (uint8_t *msg)
 {
-	uint8_t  str[64];
-	sprintf ((char *) str, "%s expected", msg);
-	aborterror (str);
+    uint8_t  str[64];
+    sprintf ((char *) str, "%s expected", msg);
+    aborterror (str);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -56,17 +56,17 @@ void expected (uint8_t *msg)
 //
 void match (uint8_t  symbol)
 {
-	uint8_t  str[2];
+    uint8_t  str[2];
 
-	if (lookahead == symbol)
-	{
-		getsymbol ();
-	}
-	else
-	{
-		sprintf ((char *) str, "%c", symbol);
-		expected (str);
-	}
+    if (lookahead == symbol)
+    {
+        getsymbol ();
+    }
+    else
+    {
+        sprintf ((char *) str, "%c", symbol);
+        expected (str);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -75,17 +75,17 @@ void match (uint8_t  symbol)
 //
 uint8_t  issymbol (uint8_t symbol)
 {
-	uint8_t  status  = FALSE;
+    uint8_t  status  = FALSE;
 
-	if (((symbol    >= 'A')  &&
-	     (symbol    <= 'Z')) ||
-		((symbol    >= 'a')  &&
-		 (symbol    <= 'z')))
-	{
-		status       = TRUE;
-	}
+    if (((symbol    >= 'A')  &&
+         (symbol    <= 'Z')) ||
+        ((symbol    >= 'a')  &&
+         (symbol    <= 'z')))
+    {
+        status       = TRUE;
+    }
 
-	return (status);
+    return (status);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -94,15 +94,15 @@ uint8_t  issymbol (uint8_t symbol)
 //
 uint8_t  isnumber (uint8_t symbol)
 {
-	uint8_t  status  = FALSE;
+    uint8_t  status  = FALSE;
 
-	if ((symbol     >= '0')  &&
-	     (symbol    <= '9')) 
-	{
-		status       = TRUE;
-	}
+    if ((symbol     >= '0')  &&
+         (symbol    <= '9')) 
+    {
+        status       = TRUE;
+    }
 
-	return (status);
+    return (status);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -111,19 +111,19 @@ uint8_t  isnumber (uint8_t symbol)
 //
 uint8_t  getname (void)
 {
-	uint8_t  value            = '\0';
-	uint8_t  str[5];
+    uint8_t  value            = '\0';
+    uint8_t  str[5];
 
-	if (issymbol (lookahead) == FALSE)
-	{
-		sprintf ((char *) str, "%s", "name");
-		expected (str);
-	}
+    if (issymbol (lookahead) == FALSE)
+    {
+        sprintf ((char *) str, "%s", "name");
+        expected (str);
+    }
 
-	value                     = lookahead;
-	getsymbol ();
+    value                     = lookahead;
+    getsymbol ();
 
-	return (value); 
+    return (value); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -132,19 +132,19 @@ uint8_t  getname (void)
 //
 uint8_t  getnumber (void)
 {
-	uint8_t  value            = '\0';
-	uint8_t  str[8];
+    uint8_t  value            = '\0';
+    uint8_t  str[8];
 
-	if (isnumber (lookahead) == FALSE)
-	{
-		sprintf ((char *) str, "%s", "integer");
-		expected (str);
-	}
+    if (isnumber (lookahead) == FALSE)
+    {
+        sprintf ((char *) str, "%s", "integer");
+        expected (str);
+    }
 
-	value                     = lookahead;
-	getsymbol ();
+    value                     = lookahead;
+    getsymbol ();
 
-	return (value); 
+    return (value); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -153,7 +153,7 @@ uint8_t  getnumber (void)
 //
 void emit (uint8_t *msg)
 {
-	fprintf (stdout, "    %s", msg);
+    fprintf (stdout, "    %s", msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -162,8 +162,20 @@ void emit (uint8_t *msg)
 //
 void emitline (uint8_t *msg)
 {
-	emit (msg);
-	fprintf (stdout, "\n");
+    emit (msg);
+    fprintf (stdout, "\n");
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//
+// expression(): parse and translate a math expression
+//
+void expression (void)
+{
+    uint8_t  str[32];
+
+    sprintf ((char *) str, "MOV R0,    %c", getnumber ());
+    emitline (str);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -172,7 +184,7 @@ void emitline (uint8_t *msg)
 //
 void initialize (void)
 {
-	getsymbol ();
+    getsymbol ();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -181,6 +193,8 @@ void initialize (void)
 //
 int32_t  main ()
 {
-	initialize ();
-	return (0);
+    initialize ();
+    expression ();
+
+    return (0);
 }

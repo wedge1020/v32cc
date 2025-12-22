@@ -9,6 +9,8 @@
 ## Declare global variables
 ##
 lookahead=                   ## lookahead character
+TRUE="0"
+FALSE="1"
                               
 ########################################################################################
 ##
@@ -25,7 +27,7 @@ function getsymbol()
 ##
 function showerror()
 {
-	msg="${1}"
+    msg="${1}"
     printf "[error] %s\n" "${msg}" 1>&2
 }
 
@@ -35,7 +37,7 @@ function showerror()
 ##
 function aborterror()
 {
-	msg="${1}"
+    msg="${1}"
     showerror "${msg}"
     exit 1
 }
@@ -46,7 +48,7 @@ function aborterror()
 ##
 function expected()
 {
-	msg="${1}"
+    msg="${1}"
     aborterror "${msg} expected"
 }
 
@@ -56,13 +58,13 @@ function expected()
 ##
 function match()
 {
-	symbol="${1}"
+    symbol="${1}"
 
     if [ "${lookahead}" = "${symbol}" ]; then
         getsymbol
     else
-		expected "${symbol}"
-	fi
+        expected "${symbol}"
+    fi
 }
 
 ########################################################################################
@@ -71,16 +73,16 @@ function match()
 ##
 function issymbol()
 {
-	symbol="${1}"
-    result="FALSE"
+    symbol="${1}"
+    result=${FALSE}
 
-	alphachk=$(echo "${symbol}" | grep '^[A-Za-z]$' | wc -l)
+    alphachk=$(echo "${symbol}" | grep '^[A-Za-z]$' | wc -l)
 
-	if [ "${alphachk}" -eq 1 ]; then
-        result="TRUE"
-	fi
+    if [ "${alphachk}" -eq 1 ]; then
+        result=${TRUE}
+    fi
 
-    return "${result}"
+    return ${result}
 }
 
 ########################################################################################
@@ -89,16 +91,16 @@ function issymbol()
 ##
 function isnumber()
 {
-	symbol="${1}"
-    result="FALSE"
+    symbol="${1}"
+    result=${FALSE}
 
-	numberchk=$(echo "${symbol}" | grep '^[0-9]$' | wc -l)
+    numberchk=$(echo "${symbol}" | grep '^[0-9]$' | wc -l)
 
-	if [ "${numberchk}" -eq 1 ]; then
-        result="TRUE"
-	fi
+    if [ "${numberchk}" -eq 1 ]; then
+        result=${TRUE}
+    fi
 
-    return "${result}"
+    return ${result}
 }
 
 ########################################################################################
@@ -107,11 +109,11 @@ function isnumber()
 ##
 function getname()
 {
-	namechk=$(issymbol "${lookahead}")
+    namechk=$(issymbol "${lookahead}")
 
     if [ "${namechk}" = "FALSE" ]; then
         expected "name"
-	fi
+    fi
 
     result="${lookahead}"
     getsymbol
@@ -125,16 +127,18 @@ function getname()
 ##
 function getnumber()
 {
-	numberchk=$(isnumber "${lookahead}")
+    numberchk=$(isnumber "${lookahead}")
 
     if [ "${numberchk}" = "FALSE" ]; then
         expected "integer"
-	fi
+    fi
 
     result="${lookahead}"
     getsymbol
 
-    return "${result}" 
+    printf "${result}"
+
+    return ${result}
 }
 
 ########################################################################################
@@ -143,7 +147,7 @@ function getnumber()
 ##
 function emit()
 {
-	msg="${1}"
+    msg="${1}"
     printf "    %s"  "${msg}"
 }
 
@@ -153,9 +157,18 @@ function emit()
 ##
 function emitline()
 {
-	msg="${1}"
+    msg="${1}"
     emit "${msg}"
     printf "\n"
+}
+
+########################################################################################
+##
+## expression(): parse and translate a math expression
+##
+function expression()
+{
+    emitline "MOV R0,    $(getnumber)"
 }
 
 ########################################################################################
@@ -172,4 +185,6 @@ function initialize()
 ## where we start
 ##
 initialize
+expression
+
 exit 0
