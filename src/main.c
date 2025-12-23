@@ -107,6 +107,22 @@ uint8_t  isnumber (uint8_t symbol)
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //
+// isaddop(): recognize an addition operation
+//
+uint8_t  isaddop (uint8_t  symbol)
+{
+    uint8_t  result  = FALSE;
+    if ((symbol     == '+') ||
+        (symbol     == '-'))
+    {
+        result       = TRUE;
+    }
+
+    return (result);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//
 // getname(): get an identifier
 //
 uint8_t  getname (void)
@@ -281,9 +297,8 @@ void subtract (void)
     match ('-');
     term ();
     emitline ((char *) "POP   R1");
-    emitline ((char *) "ISUB  R1,    R0");
-    emitline ((char *) "MOV   R0,    R1");
-    //emitline ((char *) "ISGN  R0");
+    emitline ((char *) "ISUB  R0,    R1");
+    emitline ((char *) "ISGN  R0");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -292,10 +307,16 @@ void subtract (void)
 //
 void expression (void)
 {
-    term ();
+    if (isaddop (lookahead) == TRUE)
+    {
+        emitline ((char *) "MOV   R0,    0");
+    }
+    else
+    {
+        term ();
+    }
     
-    while ((lookahead == '+') ||
-           (lookahead == '-'))
+    while (isaddop (lookahead) == TRUE)
     {
         emitline ((char *) "PUSH  R0");
 

@@ -105,7 +105,7 @@ function issymbol()
         result="TRUE"
     fi
 
-    printf "${result}"
+    echo "${result}"
 }
 
 ########################################################################################
@@ -122,7 +122,20 @@ function isnumber()
         result="TRUE"
     fi
 
-    printf "${result}\n"
+    echo "${result}"
+}
+
+########################################################################################
+##
+## isaddop(): recognize an addition operation
+##
+function isaddop()
+{
+    lookahead=$(cat ${TMPFILE}.look)
+
+    result=$(printf -- "${lookahead}" | grep -q '[+-]' && echo "TRUE" || echo "FALSE")
+
+    echo "${result}"
 }
 
 ########################################################################################
@@ -250,9 +263,8 @@ function term()
     factor
     lookahead=$(cat ${TMPFILE}.look)
 
-    while [ "${lookahead}" = '*' ] ||
-          [ "${lookahead}" = '/' ] ||
-          [ "${lookahead}" = '%' ]; do
+    multopchk=$(echo "${lookahead}" | grep -q '[*/%]' && echo "TRUE" || echo "FALSE")
+    while [ "${multopchk}" = "TRUE" ]; do
 
         emitline "PUSH  R0"
 
@@ -271,6 +283,7 @@ function term()
                 ;;
         esac
         lookahead=$(cat ${TMPFILE}.look)
+        multopchk=$(echo "${lookahead}" | grep -q '[*/%]' && echo "TRUE" || echo "FALSE")
     done
 }
 
@@ -325,9 +338,17 @@ function subtract()
 function expression()
 {
     lookahead=$(cat ${TMPFILE}.look)
-    term
-    lookahead=$(cat ${TMPFILE}.look)
-    while [ "${lookahead}" = "+" ] || [ "${lookahead}" = "-" ]; do
+    addopchk=$(isaddop)
+
+    if [ "${addopchk}" = "TRUE" ]; then
+        emitline "MOV   R0,    0"
+    else
+        term
+        lookahead=$(cat ${TMPFILE}.look)
+    fi
+
+    addopchk=$(isaddop)
+    while [ "${addopchk}" = "TRUE" ]; do
         emitline "PUSH  R0"
         case "${lookahead}" in
             "+")
@@ -341,6 +362,7 @@ function expression()
                 ;;
         esac
         lookahead=$(cat ${TMPFILE}.look)
+        addopchk=$(isaddop)
     done
 }
 
