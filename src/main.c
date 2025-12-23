@@ -174,8 +174,17 @@ void factor (void)
 {
     uint8_t  str[32];
 
-    sprintf ((char *) str, "MOV   R0,    %c", getnumber ());
-    emitline (str);
+    if (lookahead == '(')
+    {
+        match ('(');
+        expression ();
+        match (')');
+    }
+    else
+    {
+        sprintf ((char *) str, "MOV   R0,    %c", getnumber ());
+        emitline (str);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////

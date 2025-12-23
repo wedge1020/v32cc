@@ -267,7 +267,7 @@ function term()
                 modulus
                 ;;
             *)
-                expected "multiply op"
+                expected "multiply operation"
                 ;;
         esac
         lookahead=$(cat ${TMPFILE}.look)
@@ -281,9 +281,16 @@ function term()
 function factor()
 {
     lookahead=$(cat ${TMPFILE}.look)
-    number="$(getnumber)"
-    msg="MOV   R0,    ${number}"
-    emitline "${msg}"
+
+    if [ "${lookahead}" = '(' ]; then
+        match '('
+        expression
+        match ')'
+    else
+        number="$(getnumber)"
+        msg="MOV   R0,    ${number}"
+        emitline "${msg}"
+    fi
 }
 
 ########################################################################################
@@ -330,7 +337,7 @@ function expression()
                 subtract
                 ;;
             *)
-                expected "addop"
+                expected "addition operation"
                 ;;
         esac
         lookahead=$(cat ${TMPFILE}.look)
