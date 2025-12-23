@@ -201,11 +201,84 @@ function emitline()
     printf "\n"
 }
 
+
+########################################################################################
+##
+## multiply(): recognize and translate a multiplication
+##
+function multiply()
+{
+    match '*'
+    factor
+    emitline "POP   R1"
+    emitline "IMUL  R0,    R1"
+}
+
+########################################################################################
+##
+## divide(): recognize and translate a division
+##
+function divide()
+{
+    match '/'
+    factor
+    emitline "POP   R1"
+    emitline "IDIV  R1,    R0"
+    emitline "MOV   R0,    R1"
+}
+
+########################################################################################
+##
+## modulus(): recognize and translate a modulus
+##
+function modulus()
+{
+    match '%'
+    factor
+    emitline "POP   R1"
+    emitline "IMOD  R1,    R0"
+    emitline "MOV   R0,    R1"
+}
+
 ########################################################################################
 ##
 ## term(): parse and translate a math term
 ##
 function term()
+{
+    lookahead=$(cat ${TMPFILE}.look)
+    factor
+    lookahead=$(cat ${TMPFILE}.look)
+
+    while [ "${lookahead}" = '*' ] ||
+          [ "${lookahead}" = '/' ] ||
+          [ "${lookahead}" = '%' ]; do
+
+        emitline "PUSH  R0"
+
+        case "${lookahead}" in
+            '*')
+                multiply
+                ;;
+            '/')
+                divide
+                ;;
+            '%')
+                modulus
+                ;;
+            *)
+                expected "multiply op"
+                ;;
+        esac
+        lookahead=$(cat ${TMPFILE}.look)
+    done
+}
+
+########################################################################################
+##
+## factor(): parse and translate a math factor
+##
+function factor()
 {
     lookahead=$(cat ${TMPFILE}.look)
     number="$(getnumber)"

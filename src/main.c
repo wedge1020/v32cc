@@ -168,14 +168,87 @@ void emitline (uint8_t *msg)
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //
-// term(): parse and translate a math term
+// factor(): parse and translate a math factor
 //
-void term (void)
+void factor (void)
 {
     uint8_t  str[32];
 
     sprintf ((char *) str, "MOV   R0,    %c", getnumber ());
     emitline (str);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//
+// multiply(): recognize and translate a multiplication
+//
+void multiply (void)
+{
+    match ('*');
+    factor ();
+    emitline ((char *) "POP   R1");
+    emitline ((char *) "IMUL  R0,    R1");
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//
+// divide(): recognize and translate a division
+//
+void divide (void)
+{
+    match ('/');
+    factor ();
+    emitline ((char *) "POP   R1");
+    emitline ((char *) "IDIV  R1,    R0");
+    emitline ((char *) "MOV   R0,    R1");
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//
+// modulus(): recognize and translate a modulus
+//
+void modulus (void)
+{
+    match ('%');
+    factor ();
+    emitline ((char *) "POP   R1");
+    emitline ((char *) "IMOD  R1,    R0");
+    emitline ((char *) "MOV   R0,    R1");
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//
+// term(): parse and translate a math term
+//
+void term (void)
+{
+    factor ();
+    
+    while ((lookahead == '*') ||
+           (lookahead == '/') ||
+           (lookahead == '%'))
+    {
+        emitline ((char *) "PUSH  R0");
+
+        switch (lookahead)
+        {
+            case '*':
+                multiply ();
+                break;
+
+            case '/':
+                divide ();
+                break;
+
+            case '%':
+                modulus ();
+                break;
+
+            default:
+                expected ((char *) "multiply operation");
+                break;
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -199,8 +272,9 @@ void subtract (void)
     match ('-');
     term ();
     emitline ((char *) "POP   R1");
-    emitline ((char *) "ISUB  R0,    R1");
-    emitline ((char *) "ISGN  R0");
+    emitline ((char *) "ISUB  R1,    R0");
+    emitline ((char *) "MOV   R0,    R1");
+    //emitline ((char *) "ISGN  R0");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
