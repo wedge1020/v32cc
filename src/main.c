@@ -186,6 +186,7 @@ void add (void)
 {
     match ('+');
     term ();
+    emitline ((char *) "POP   R1");
     emitline ((char *) "IADD  R0,    R1");
 }
 
@@ -197,6 +198,7 @@ void subtract (void)
 {
     match ('-');
     term ();
+    emitline ((char *) "POP   R1");
     emitline ((char *) "ISUB  R0,    R1");
     emitline ((char *) "ISGN  R0");
 }
@@ -212,7 +214,7 @@ void expression (void)
     while ((lookahead == '+') ||
            (lookahead == '-'))
     {
-        emitline ((char *) "MOV   R1,    R0");
+        emitline ((char *) "PUSH  R0");
 
         switch (lookahead)
         {

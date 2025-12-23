@@ -221,6 +221,7 @@ function add()
 {
     match "+"
     term
+    emitline "POP   R1"
     emitline "IADD  R0,    R1"
 }
 
@@ -232,6 +233,7 @@ function subtract()
 {
     match "-"
     term
+    emitline "POP   R1"
     emitline "ISUB  R0,    R1"
     emitline "ISGN  R0"
 }
@@ -246,7 +248,7 @@ function expression()
     term
     lookahead=$(cat ${TMPFILE}.look)
     while [ "${lookahead}" = "+" ] || [ "${lookahead}" = "-" ]; do
-        emitline "MOV   R1,    R0"
+        emitline "PUSH  R0"
         case "${lookahead}" in
             "+")
                 add
