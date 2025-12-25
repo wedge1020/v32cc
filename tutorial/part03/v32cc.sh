@@ -409,7 +409,7 @@ function assignment ()
     emitlabel "fhack2"
     emitline  "POP   R2"
     emitline  "LEA   R1,    [R2+${name}]"
-    emitline  "MOV   R0,    [R1]"
+    emitline  "MOV   [R1],  R0"
 }
 
 ########################################################################################
@@ -429,9 +429,10 @@ function initialize()
 ## where we start
 ##
 initialize
-expression
+assignment
 if [ ! "${alookahead}" = '\n' ]; then
     expected "newline"
+fi
 
 rm -f ${TMPFILE} ${TMPFILE}.look
 

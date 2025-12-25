@@ -395,7 +395,7 @@ void assignment (void)
     emitline (str);
     sprintf ((char *) str, "LEA   R1,    [R2+%c]", name);
     emitline (str);
-    emitline ((char *) "MOV   R0,    [R1]");
+    emitline ((char *) "MOV   [R1],  R0");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -414,7 +414,7 @@ void initialize (void)
 int32_t  main ()
 {
     initialize ();
-    expression ();
+    assignment ();
     if (lookahead != '\n')
     {
         expected ((char *) "newline");
