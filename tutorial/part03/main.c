@@ -206,7 +206,7 @@ void ident (void)
     {
         match ('(');
         match (')');
-        sprintf ((char *) str, "CALL  %s", name); 
+        sprintf ((char *) str, "CALL  %c", name); 
         emitline (str);
     }
     else
