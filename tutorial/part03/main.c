@@ -217,7 +217,7 @@ void ident (void)
         emitlabel (str);
         sprintf ((char *) str, "POP   R1");
         emitline (str);
-        sprintf ((char *) str, "LEA   R0,    [R1+%c]", getname ());
+        sprintf ((char *) str, "LEA   R0,    [R1+%c]", name);
         emitline (str);
     }
 }

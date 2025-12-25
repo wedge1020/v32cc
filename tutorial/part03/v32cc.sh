@@ -314,7 +314,7 @@ function ident()
         emitline "CALL  fhack"
         emitlabel "fhack"
         emitline "POP   R1"
-        emitline "LEA   R0,    [R1+$(getname)]"
+        emitline "LEA   R0,    [R1+${name}]"
     fi
 }
 
